@@ -8,7 +8,7 @@ namespace Kalyna
     {
         private static void Main(string[] args)
         {
-            var a = new Algorithm();
+            var algorithm = new Algorithm();
             var key = new Block
             {
                 Data = new List<byte>
@@ -18,11 +18,11 @@ namespace Kalyna
                 }
             };
 
-            var keys = a.GenerateRoundsKeys(key);
+            var keys = algorithm.GenerateRoundsKeys(key);
             Console.WriteLine();
             for (var i = 0; i < keys.Count; i++)
             {
-                a.Log(i.ToString(), keys[i]);
+                algorithm.Log(i.ToString(), keys[i]);
             }
         }
     }

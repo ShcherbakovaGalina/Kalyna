@@ -24,7 +24,7 @@ namespace Kalyna
                 dataBi += new BigInteger(key.Data.Where((d, idx) => i <= idx && idx < i + n).ToArray());
                 var newData = dataBi.ToByteArray();
                 for (var j = 0; j < n; j++)
-                    Data[i + j] = newData[j];
+                    Data[i + j] = j < newData.Length ? newData[j] : (byte)0;
             }
             //var dataBi = new BigInteger(Data.ToArray());
             ////var keyBi = new BigInteger(key.Data.ToArray());
