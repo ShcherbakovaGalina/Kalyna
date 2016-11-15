@@ -6,9 +6,15 @@ namespace Kalyna
 {
     public class Algorithm
     {
+        public void Log(string message, Block block)
+        {
+            Console.WriteLine($"{message,-30} {new BigInteger(block.Data.ToArray()).ToString("X32")}");
+        }
 
         public List<Block> GenerateRoundsKeys(Block key)
         {
+            Log("Key", key);
+
             var keys = new List<Block>();
             for (var i = 0; i <= 10; i++)
                 keys.Add(new Block());
@@ -19,31 +25,38 @@ namespace Kalyna
             {
                 Data = new List<byte>
                 {
-                    0x86, 0x2F, 0x1F, 0x65,
-                    0x3B, 0x77, 0x5B, 0xA1,
-                    0xD0, 0x5C, 0xBC, 0x2F,
-                    0x38, 0xE2, 0xD8, 0x7D
+                    0x7D, 0xD8, 0xE2, 0x38, 0x2F, 0xBC, 0x5C, 0xD0,
+                    0xA1, 0x5B, 0x77, 0x3B, 0x65, 0x1F, 0x2F, 0x86
                 }
             };
-            for (var i = 0; i <= 10; i++)
+            Log("KT", kt);
+
+            for (var i = 2; i <= 2; i++)
             {
+                Console.WriteLine();
                 var roundKey = keys[i];
                 roundKey.Data = new List<byte>(StaticTables.V);
-                Console.WriteLine($"1. {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
                 roundKey.ShiftLeft(i / 2);
-                Console.WriteLine($"2. {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
+                Log($"state[{i}].ShiftLeft (tmv):", roundKey);
 
-                roundKey.RotateRight(32 * i);
-                Console.WriteLine($"3. {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
+                var keyCopy = new Block(key);
+                keyCopy.RotateRight(32 * i);
+                Log($"state[{i}].Rotate (id):", keyCopy);
 
-                var tmv = new Block(roundKey);
-                tmv.AddRoundKey(kt);
-                Console.WriteLine($"4. {new BigInteger(tmv.Data.ToArray()).ToString("X")}");
                 roundKey.AddRoundKey(kt);
-                Console.WriteLine($"5. {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
+                Log($"state[{i}].add_rkey (tmv):", roundKey);
 
-                roundKey.AddRoundKey(tmv);
-                Console.WriteLine($"6. {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
+                roundKey.AddRoundKey(keyCopy);
+                Log($"state[{i}].add_rkey (kt_round):", roundKey);
+
+                //var tmv = new Block(roundKey);
+                //tmv.AddRoundKey(kt);
+                //Console.WriteLine($"{"tmv",-30} {new BigInteger(tmv.Data.ToArray()).ToString("X")}");
+                //roundKey.AddRoundKey(kt);
+                //Console.WriteLine($"{"5.",-30} {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
+
+                //roundKey.AddRoundKey(tmv);
+                //Console.WriteLine($"{"kt_round", -30} {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
             }
 
             // Odd keys

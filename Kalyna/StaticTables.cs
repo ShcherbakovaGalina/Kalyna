@@ -9,8 +9,6 @@ namespace Kalyna
         public static List<byte> V = new List<byte>
         {
             0, 1, 0, 1, 0, 1, 0, 1,
-            0, 1, 0, 1, 0, 1, 0, 1,
-            0, 1, 0, 1, 0, 1, 0, 1,
             0, 1, 0, 1, 0, 1, 0, 1
         };
 
