@@ -47,5 +47,11 @@ namespace Kalyna
                 trump = ++trump % 4;
             }
         }
+
+        public void Xor(Block key)
+        {
+            for (var i = 0; i < Data.Count; i++)
+                Data[i] ^= key.Data[i];
+        }
     }
 }

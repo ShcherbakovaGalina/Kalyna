@@ -43,6 +43,7 @@ namespace Kalyna
                 keyCopy.RotateRight(32 * i);
                 Log($"state[{i}].Rotate (id):", keyCopy);
 
+                var copy = new Block(roundKey);
                 roundKey.AddRoundKey(kt);
                 Log($"state[{i}].add_rkey (tmv):", roundKey);
 
@@ -51,6 +52,9 @@ namespace Kalyna
 
                 roundKey.SubBytes();
                 Log($"state[{i}].s_box:", roundKey);
+
+                roundKey.Xor(copy);
+                Log($"state[{i}].xor_rkey (kt_round):", roundKey);
 
                 //var tmv = new Block(roundKey);
                 //tmv.AddRoundKey(kt);
