@@ -31,7 +31,7 @@ namespace Kalyna
             };
             Log("KT", kt);
 
-            for (var i = 2; i <= 2; i++)
+            for (var i = 2; i <= 10; i += 2)
             {
                 Console.WriteLine();
                 var roundKey = keys[i];
@@ -43,9 +43,9 @@ namespace Kalyna
                 keyCopy.RotateRight(32 * i);
                 Log($"state[{i}].Rotate (id):", keyCopy);
 
-                var copy = new Block(roundKey);
                 roundKey.AddRoundKey(kt);
                 Log($"state[{i}].add_rkey (tmv):", roundKey);
+                var copy = new Block(roundKey);
 
                 roundKey.AddRoundKey(keyCopy);
                 Log($"state[{i}].add_rkey (kt_round):", roundKey);
@@ -59,8 +59,21 @@ namespace Kalyna
                 roundKey.MixColumns();
                 Log($"state[{i}].m_col:", roundKey);
 
-                //roundKey.Xor(copy);
-                //Log($"state[{i}].xor_rkey (kt_round):", roundKey);
+                roundKey.Xor(copy);
+                Log($"state[{i}].xor_rkey (kt_round):", roundKey);
+
+                roundKey.SubBytes();
+                Log($"state[{i}].s_box:", roundKey);
+
+                roundKey.ShiftRows();
+                Log($"state[{i}].s_row:", roundKey);
+
+                roundKey.MixColumns();
+                Log($"state[{i}].m_col:", roundKey);
+
+                roundKey.AddRoundKey(copy);
+                Log($"state[{i}].add_rkey (tmv):", copy);
+                Log($"state[{i}].add_rkey (kt_round):", roundKey);
 
                 //var tmv = new Block(roundKey);
                 //tmv.AddRoundKey(kt);

@@ -17,14 +17,27 @@ namespace Kalyna
 
         public void AddRoundKey(Block key)
         {
-            for (var i = 0; i < Data.Count; i++)
-                Data[i] += key.Data[i];
+            const int n = 8;
+            for (var i = 0; i < 16; i += n)
+            {
+                var dataBi = new BigInteger(Data.Where((d, idx) => i <= idx && idx < i + n).ToArray());
+                dataBi += new BigInteger(key.Data.Where((d, idx) => i <= idx && idx < i + n).ToArray());
+                var newData = dataBi.ToByteArray();
+                for (var j = 0; j < n; j++)
+                    Data[i + j] = newData[j];
+            }
+            //var dataBi = new BigInteger(Data.ToArray());
+            ////var keyBi = new BigInteger(key.Data.ToArray());
+            //dataBi += new BigInteger(key.Data.ToArray());
+            //Data = new List<byte>(dataBi.ToByteArray().Where((t, idx) => idx < 16));
+            //for (var i = 0; i < Data.Count; i++)
+            //    Data[i] += key.Data[i];
         }
 
         public void RotateRight(int i)
         {
             var bi = new BigInteger(Data.ToArray());
-            bi = (bi >> i) | (bi << (128 - i));
+            bi = (bi >> i % 128) | (bi << (128 - i % 128));
             Data = new List<byte>(bi.ToByteArray().Where((t, idx) => idx < 16));
         }
 
@@ -104,7 +117,7 @@ namespace Kalyna
                 Data[trump] = sum;
                 trump--;
             }
-            
+
             // Second column
             trump = Data.Count - 1 - 8;
             for (var row = 0; row < 8; row++)
