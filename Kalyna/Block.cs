@@ -41,6 +41,13 @@ namespace Kalyna
             Data = new List<byte>(bi.ToByteArray().Where((t, idx) => idx < 16));
         }
 
+        public void RotateLeft(int i)
+        {
+            var bi = new BigInteger(Data.ToArray());
+            bi = (bi << i % 128) | (bi >> (128 - i % 128));
+            Data = new List<byte>(bi.ToByteArray().Where((t, idx) => idx < 16));
+        }
+
         public void ShiftLeft(int i)
         {
             var bi = new BigInteger(Data.ToArray());

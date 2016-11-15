@@ -74,21 +74,17 @@ namespace Kalyna
                 roundKey.AddRoundKey(copy);
                 Log($"state[{i}].add_rkey (tmv):", copy);
                 Log($"state[{i}].add_rkey (kt_round):", roundKey);
-
-                //var tmv = new Block(roundKey);
-                //tmv.AddRoundKey(kt);
-                //Console.WriteLine($"{"tmv",-30} {new BigInteger(tmv.Data.ToArray()).ToString("X")}");
-                //roundKey.AddRoundKey(kt);
-                //Console.WriteLine($"{"5.",-30} {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
-
-                //roundKey.AddRoundKey(tmv);
-                //Console.WriteLine($"{"kt_round", -30} {new BigInteger(roundKey.Data.ToArray()).ToString("X")}");
+                keys[i] = roundKey;
             }
 
             // Odd keys
+            for (var i = 1; i <= 9; i += 2)
+            {
+                keys[i].Data = keys[i - 1].Data;
+                keys[i].RotateLeft(64);
+            }
 
-
-            return null;
+            return keys;
         }
 
     }

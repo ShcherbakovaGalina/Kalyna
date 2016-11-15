@@ -8,14 +8,6 @@ namespace Kalyna
     {
         private static void Main(string[] args)
         {
-            //var cyka = new byte[] { 0x7F };
-
-            //var c = new BigInteger(cyka);
-            ////c = c << 1;
-            //var h = BigInteger.Parse("127");
-
-            //Console.WriteLine(c);
-
             var a = new Algorithm();
             var key = new Block
             {
@@ -25,7 +17,13 @@ namespace Kalyna
                     7, 6, 5, 4, 3, 2, 1, 0
                 }
             };
-            a.GenerateRoundsKeys(key);
+
+            var keys = a.GenerateRoundsKeys(key);
+            Console.WriteLine();
+            for (var i = 0; i < keys.Count; i++)
+            {
+                a.Log(i.ToString(), keys[i]);
+            }
         }
     }
 }
