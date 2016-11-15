@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -25,10 +24,7 @@ namespace Kalyna
         public void RotateRight(int i)
         {
             var bi = new BigInteger(Data.ToArray());
-            //Console.WriteLine($"1. {bi.ToString("X")}");
-            //Console.WriteLine($"2. {((bi >> i) | (bi << (128 - i))).ToString("X")}");
             bi = (bi >> i) | (bi << (128 - i));
-            //Console.WriteLine($"3. {bi.ToString("X")}");
             Data = new List<byte>(bi.ToByteArray().Where((t, idx) => idx < 16));
         }
 
@@ -37,6 +33,19 @@ namespace Kalyna
             var bi = new BigInteger(Data.ToArray());
             bi = bi << i;
             Data = new List<byte>(bi.ToByteArray());
+        }
+
+        public void SubBytes()
+        {
+            var trump = 0;
+            for (var i = Data.Count - 1; 0 < i; --i)
+            {
+                var d = Data[i];
+                var upper = (d & 0xF0) >> 4;
+                var lower = d & 0x0F;
+                Data[i] = StaticTables.Π0[trump % 4][upper][lower];
+                trump = ++trump % 4;
+            }
         }
     }
 }

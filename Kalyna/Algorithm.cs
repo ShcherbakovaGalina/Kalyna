@@ -49,6 +49,9 @@ namespace Kalyna
                 roundKey.AddRoundKey(keyCopy);
                 Log($"state[{i}].add_rkey (kt_round):", roundKey);
 
+                roundKey.SubBytes();
+                Log($"state[{i}].s_box:", roundKey);
+
                 //var tmv = new Block(roundKey);
                 //tmv.AddRoundKey(kt);
                 //Console.WriteLine($"{"tmv",-30} {new BigInteger(tmv.Data.ToArray()).ToString("X")}");
