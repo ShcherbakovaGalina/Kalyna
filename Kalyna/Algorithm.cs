@@ -53,8 +53,14 @@ namespace Kalyna
                 roundKey.SubBytes();
                 Log($"state[{i}].s_box:", roundKey);
 
-                roundKey.Xor(copy);
-                Log($"state[{i}].xor_rkey (kt_round):", roundKey);
+                roundKey.ShiftRows();
+                Log($"state[{i}].s_row:", roundKey);
+
+                roundKey.MixColumns();
+                Log($"state[{i}].m_col:", roundKey);
+
+                //roundKey.Xor(copy);
+                //Log($"state[{i}].xor_rkey (kt_round):", roundKey);
 
                 //var tmv = new Block(roundKey);
                 //tmv.AddRoundKey(kt);
