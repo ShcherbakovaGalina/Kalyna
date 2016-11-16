@@ -20,7 +20,7 @@ namespace Kalyna
                 PlainTextFileName = "Files\\Plain.txt",
                 EncryptedTextFileName = "Files\\Encrypted.txt",
                 DecryptedTextFileName = "Files\\Decrypted.txt",
-                Key = key
+                KeyFileName = "Files\\Key.txt"
             };
             f.Encode();
             f.Decode();

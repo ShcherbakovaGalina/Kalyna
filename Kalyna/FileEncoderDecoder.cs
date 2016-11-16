@@ -10,8 +10,7 @@ namespace Kalyna
         public string PlainTextFileName { private get; set; }
         public string EncryptedTextFileName { private get; set; }
         public string DecryptedTextFileName { private get; set; }
-
-        public Block Key { private get; set; }
+        public string KeyFileName { private get; set; }
 
         private Random Random { get; } = new Random();
         private int BlocksNumber { get; set; }
@@ -22,12 +21,25 @@ namespace Kalyna
             return directoryInfo == null ? string.Empty : Path.Combine(directoryInfo.FullName, fileName);
         }
 
-        private void AddByteToBlock(ref byte[] block, byte data)
+        private static void AddByteToBlock(ref byte[] block, byte data)
         {
             var newArray = new byte[block.Length + 1];
             block.CopyTo(newArray, 1);
             newArray[0] = data;
             block = newArray;
+        }
+
+        private Block GetKey()
+        {
+            var keyFilePath = GetFullFilePath(KeyFileName);
+
+            if (!File.Exists(keyFilePath)) return null;
+
+            using (var reader = new BinaryReader(File.Open(keyFilePath, FileMode.Open)))
+            {
+                var key = reader.ReadBytes(16);
+                return key.Length != 16 ? null : new Block {Data = new List<byte>(key)};
+            }
         }
 
         public void Encode()
@@ -37,9 +49,11 @@ namespace Kalyna
 
             if (!File.Exists(plainFilePath)) return;
 
-            var areAddedRandomBytes = false;
             var algorithm = new Algorithm();
-            algorithm.GenerateRoundsKeys(Key);
+            var key = GetKey();
+            algorithm.GenerateRoundsKeys(key);
+
+            var areAddedRandomBytes = false;
             using (var reader = new BinaryReader(File.Open(plainFilePath, FileMode.Open)))
             using (var writer = new BinaryWriter(File.Open(encryptedFilePath, FileMode.Create)))
             {
@@ -61,7 +75,7 @@ namespace Kalyna
                     var cipherText = algorithm.Encrypt(new Block
                     {
                         Data = new List<byte>(block)
-                    }, Key);
+                    }, key);
                     writer.Write(cipherText.Data.ToArray());
                     previousBlock = block;
                     block = reader.ReadBytes(16);
@@ -75,7 +89,7 @@ namespace Kalyna
                     var cipherText = algorithm.Encrypt(new Block
                     {
                         Data = new List<byte>(block)
-                    }, Key);
+                    }, key);
                     writer.Write(cipherText.Data.ToArray());
                 }
             }
@@ -89,7 +103,8 @@ namespace Kalyna
             if (!File.Exists(encryptedFilePath)) return;
 
             var algorithm = new Algorithm();
-            algorithm.GenerateRoundsKeys(Key);
+            var key = GetKey();
+            algorithm.GenerateRoundsKeys(key);
             using (var reader = new BinaryReader(File.Open(encryptedFilePath, FileMode.Open)))
             using (var writer = new BinaryWriter(File.Open(decryptedFilePath, FileMode.Create)))
             {
@@ -100,7 +115,7 @@ namespace Kalyna
                     var plainText = algorithm.Decrypt(new Block
                     {
                         Data = new List<byte>(block)
-                    }, Key);
+                    }, key);
                     if (nextBlock.Length == 0 && plainText.Data[0] <= 16)
                     {
                         var numberOfAddedBytes = plainText.Data[0];
