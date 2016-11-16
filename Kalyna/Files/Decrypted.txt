@@ -1,1 +1,14 @@
-Test
+﻿using System.Collections.Generic;
+
+namespace Kalyna
+{
+    public static class StaticTables
+    {
+        public static readonly List<byte> V = new List<byte>
+        {
+            0, 1, 0, 1, 0, 1, 0, 1,
+            0, 1, 0, 1, 0, 1, 0, 1
+        };
+
+
+}

@@ -6,9 +6,9 @@
         {
             var f = new FileEncoderDecoder
             {
-                PlainTextFileName = "Files\\Plain small.txt",
-                EncryptedTextFileName = "Files\\Encrypted.txt",
-                DecryptedTextFileName = "Files\\Decrypted.txt",
+                PlainTextFileName = "Files\\Plain.txt",
+                EncryptedTextFileName = "Files\\Encrypted2.txt",
+                DecryptedTextFileName = "Files\\Decrypted2.txt",
                 KeyFileName = "Files\\Key.txt"
             };
             f.Encode();

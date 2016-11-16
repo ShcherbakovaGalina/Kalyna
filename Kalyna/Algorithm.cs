@@ -6,7 +6,7 @@ namespace Kalyna
 {
     public class Algorithm
     {
-        public bool UseLog { get; set; } = true;
+        public bool UseLog { get; set; } = false;
 
         private List<Block> RoundsKeys { get; } = new List<Block>();
 
