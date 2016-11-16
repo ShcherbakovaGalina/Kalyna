@@ -8,9 +8,9 @@ namespace Kalyna
     {
         public bool UseLog { get; set; } = false;
 
-        private List<Block> RoundsKeys { get; set; } = new List<Block>();
+        private List<Block> RoundsKeys { get; } = new List<Block>();
 
-        public void Log(string message, Block block)
+        private static void Log(string message, Block block)
         {
             Console.WriteLine($"{message,-30} {new BigInteger(block.Data.ToArray()).ToString("X32")}");
         }

@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace Kalyna
+﻿namespace Kalyna
 {
     internal static class Program
     {
         private static void Main()
         {
-           
-
             var f = new FileEncoderDecoder
             {
                 PlainTextFileName = "Files\\Plain.txt",
