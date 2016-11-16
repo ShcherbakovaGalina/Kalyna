@@ -29,7 +29,7 @@ namespace Kalyna
             if (UseLog)
                 Log("state[0].add_rkey:", kt);
 
-            kt.SubBytes();
+            kt.SubBytes(StaticTables.Π);
             if (UseLog)
                 Log("state[0].s_box:", kt);
 
@@ -37,7 +37,7 @@ namespace Kalyna
             if (UseLog)
                 Log("state[0].s_row:", kt);
 
-            kt.MixColumns();
+            kt.MixColumns(StaticTables.Mds);
             if (UseLog)
                 Log("state[0].m_col:", kt);
 
@@ -45,7 +45,7 @@ namespace Kalyna
             if (UseLog)
                 Log("state[0].xor_rkey:", kt);
 
-            kt.SubBytes();
+            kt.SubBytes(StaticTables.Π);
             if (UseLog)
                 Log("state[0].s_box:", kt);
 
@@ -53,7 +53,7 @@ namespace Kalyna
             if (UseLog)
                 Log("state[0].s_row:", kt);
 
-            kt.MixColumns();
+            kt.MixColumns(StaticTables.Mds);
             if (UseLog)
                 Log("state[0].m_col:", kt);
 
@@ -61,7 +61,7 @@ namespace Kalyna
             if (UseLog)
                 Log("state[0].add_rkey:", kt);
 
-            kt.SubBytes();
+            kt.SubBytes(StaticTables.Π);
             if (UseLog)
                 Log("state[0].s_box:", kt);
 
@@ -69,7 +69,7 @@ namespace Kalyna
             if (UseLog)
                 Log("state[0].s_row:", kt);
 
-            kt.MixColumns();
+            kt.MixColumns(StaticTables.Mds);
             if (UseLog)
                 Log("state[0].m_col:", kt);
 
@@ -120,7 +120,7 @@ namespace Kalyna
                 if (UseLog)
                     Log($"state[{i}].add_rkey (kt_round):", roundKey);
 
-                roundKey.SubBytes();
+                roundKey.SubBytes(StaticTables.Π);
                 if (UseLog)
                     Log($"state[{i}].s_box:", roundKey);
 
@@ -128,7 +128,7 @@ namespace Kalyna
                 if (UseLog)
                     Log($"state[{i}].s_row:", roundKey);
 
-                roundKey.MixColumns();
+                roundKey.MixColumns(StaticTables.Mds);
                 if (UseLog)
                     Log($"state[{i}].m_col:", roundKey);
 
@@ -136,7 +136,7 @@ namespace Kalyna
                 if (UseLog)
                     Log($"state[{i}].xor_rkey (kt_round):", roundKey);
 
-                roundKey.SubBytes();
+                roundKey.SubBytes(StaticTables.Π);
                 if (UseLog)
                     Log($"state[{i}].s_box:", roundKey);
 
@@ -144,7 +144,7 @@ namespace Kalyna
                 if (UseLog)
                     Log($"state[{i}].s_row:", roundKey);
 
-                roundKey.MixColumns();
+                roundKey.MixColumns(StaticTables.Mds);
                 if (UseLog)
                     Log($"state[{i}].m_col:", roundKey);
 
@@ -173,48 +173,100 @@ namespace Kalyna
 
         public Block Encrypt(Block plainText, Block key)
         {
-            var encryptedText = new Block(RoundsKeys[0]);
-            //encryptedText.AddRoundKey(RoundsKeys[0]);
+            var cipherText = new Block(plainText);
+            cipherText.AddRoundKey(RoundsKeys[0]);
 
             for (var i = 1; i <= 9; i++)
             {
                 if (UseLog)
                     Console.WriteLine();
 
-                encryptedText.SubBytes();
+                cipherText.SubBytes(StaticTables.Π);
                 if (UseLog)
-                    Log($"round[{i}].s_box:", encryptedText);
+                    Log($"round[{i}].s_box:", cipherText);
 
-                encryptedText.ShiftRows();
+                cipherText.ShiftRows();
                 if (UseLog)
-                    Log($"round[{i}].s_row:", encryptedText);
+                    Log($"round[{i}].s_row:", cipherText);
 
-                encryptedText.MixColumns();
+                cipherText.MixColumns(StaticTables.Mds);
                 if (UseLog)
-                    Log($"round[{i}].m_col:", encryptedText);
+                    Log($"round[{i}].m_col:", cipherText);
 
-                encryptedText.Xor(RoundsKeys[i]);
+                cipherText.Xor(RoundsKeys[i]);
                 if (UseLog)
-                    Log($"round[{i}].xor_rkey:", encryptedText);
+                    Log($"round[{i}].xor_rkey:", cipherText);
             }
 
-            encryptedText.SubBytes();
             if (UseLog)
-                Log("round[10].s_box:", encryptedText);
+                Console.WriteLine();
 
-            encryptedText.ShiftRows();
+            cipherText.SubBytes(StaticTables.Π);
             if (UseLog)
-                Log("round[10].s_row:", encryptedText);
+                Log("round[10].s_box:", cipherText);
 
-            encryptedText.MixColumns();
+            cipherText.ShiftRows();
             if (UseLog)
-                Log("round[10].m_col:", encryptedText);
+                Log("round[10].s_row:", cipherText);
 
-            encryptedText.AddRoundKey(RoundsKeys[9]);
+            cipherText.MixColumns(StaticTables.Mds);
             if (UseLog)
-                Log("round[10].add_rkey:", encryptedText);
+                Log("round[10].m_col:", cipherText);
 
-            return encryptedText;
+            cipherText.AddRoundKey(RoundsKeys[10]);
+            if (UseLog)
+                Log("round[10].add_rkey:", cipherText);
+
+            return cipherText;
+        }
+
+        public Block Decrypt(Block cipherText, Block key)
+        {
+            var plainText = new Block(cipherText);
+
+            plainText.SubRoundKey(RoundsKeys[10]);
+            if (UseLog)
+                Log("round[10].sub_rkey:", plainText);
+
+            plainText.MixColumns(StaticTables.MdsRev);
+            if (UseLog)
+                Log("round[10].m_col:", plainText);
+
+            plainText.ShiftRowsRev();
+            if (UseLog)
+                Log("round[10].s_row:", plainText);
+
+            plainText.SubBytes(StaticTables.ΠRev);
+            if (UseLog)
+                Log("round[10].s_box:", plainText);
+
+            for (var i = 9; 1 <= i; --i)
+            {
+                if (UseLog)
+                    Console.WriteLine();
+
+                plainText.Xor(RoundsKeys[i]);
+                if (UseLog)
+                    Log($"round[{i}].xor_rkey:", plainText);
+
+                plainText.MixColumns(StaticTables.MdsRev);
+                if (UseLog)
+                    Log($"round[{i}].m_col:", plainText);
+
+                plainText.ShiftRowsRev();
+                if (UseLog)
+                    Log($"round[{i}].s_row:", plainText);
+
+                plainText.SubBytes(StaticTables.ΠRev);
+                if (UseLog)
+                    Log($"round[{i}].s_box:", plainText);
+            }
+
+            plainText.SubRoundKey(RoundsKeys[0]);
+            if (UseLog)
+                Log("round[0].sub_rkey:", plainText);
+
+            return plainText;
         }
     }
 }

@@ -34,6 +34,25 @@ namespace Kalyna
             //    Data[i] += key.Data[i];
         }
 
+        public void SubRoundKey(Block key)
+        {
+            const int n = 8;
+            for (var i = 0; i < 16; i += n)
+            {
+                var dataBi = new BigInteger(Data.Where((d, idx) => i <= idx && idx < i + n).ToArray());
+                dataBi -= new BigInteger(key.Data.Where((d, idx) => i <= idx && idx < i + n).ToArray());
+                var newData = dataBi.ToByteArray();
+                for (var j = 0; j < n; j++)
+                    Data[i + j] = j < newData.Length ? newData[j] : (byte)0;
+            }
+            //var dataBi = new BigInteger(Data.ToArray());
+            ////var keyBi = new BigInteger(key.Data.ToArray());
+            //dataBi += new BigInteger(key.Data.ToArray());
+            //Data = new List<byte>(dataBi.ToByteArray().Where((t, idx) => idx < 16));
+            //for (var i = 0; i < Data.Count; i++)
+            //    Data[i] += key.Data[i];
+        }
+
         public void RotateRight(int i)
         {
             var bi = new BigInteger(Data.ToArray());
@@ -55,7 +74,7 @@ namespace Kalyna
             Data = new List<byte>(bi.ToByteArray());
         }
 
-        public void SubBytes()
+        public void SubBytes(byte[][][] table)
         {
             var trump = 0;
             for (var i = Data.Count - 1; 0 <= i; --i)
@@ -63,7 +82,7 @@ namespace Kalyna
                 var d = Data[i];
                 var upper = (d & 0xF0) >> 4;
                 var lower = d & 0x0F;
-                Data[i] = StaticTables.Π0[trump % 4][upper][lower];
+                Data[i] = table[trump % 4][upper][lower];
                 trump = ++trump % 4;
             }
         }
@@ -89,6 +108,12 @@ namespace Kalyna
                 ShiftBytesPair(i, i - 8);
         }
 
+        public void ShiftRowsRev()
+        {
+            for (var i = 11; 8 <= i; --i)
+                ShiftBytesPair(i - 8, i);
+        }
+
         private static byte Gmul(int a, int b)
         {
             byte p = 0; /* the product of the multiplication */
@@ -106,7 +131,7 @@ namespace Kalyna
             return p;
         }
 
-        public void MixColumns()
+        public void MixColumns(byte[][] table)
         {
             var dataCopy = new List<byte>(Data);
 
@@ -118,7 +143,7 @@ namespace Kalyna
                 var hillary = Data.Count - 1;
                 for (var h = 0; h < 8; h++)
                 {
-                    sum ^= Gmul(dataCopy[hillary], StaticTables.Mds[row][h]);
+                    sum ^= Gmul(dataCopy[hillary], table[row][h]);
                     hillary--;
                 }
                 Data[trump] = sum;
@@ -133,7 +158,7 @@ namespace Kalyna
                 var hillary = Data.Count - 1 - 8;
                 for (var h = 0; h < 8; h++)
                 {
-                    sum ^= Gmul(dataCopy[hillary], StaticTables.Mds[row][h]);
+                    sum ^= Gmul(dataCopy[hillary], table[row][h]);
                     hillary--;
                 }
                 Data[trump] = sum;

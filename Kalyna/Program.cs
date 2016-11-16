@@ -35,7 +35,13 @@ namespace Kalyna
                     23, 22, 21, 20, 19, 18, 17, 16
                 }
             };
-            algorithm.Encrypt(plainText, key);
+            var cipherText = algorithm.Encrypt(plainText, key);
+            var newPlain = algorithm.Decrypt(cipherText, key);
+
+            Console.WriteLine();
+            algorithm.Log("Plain", plainText);
+            algorithm.Log("Cipher", cipherText);
+            algorithm.Log("New plain", newPlain);
         }
     }
 }
