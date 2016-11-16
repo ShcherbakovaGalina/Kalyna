@@ -6,14 +6,7 @@ namespace Kalyna
     {
         private static void Main()
         {
-            var key = new Block
-            {
-                Data = new List<byte>
-                {
-                    15, 14, 13, 12, 11, 10, 9, 8,
-                    7, 6, 5, 4, 3, 2, 1, 0
-                }
-            };
+           
 
             var f = new FileEncoderDecoder
             {

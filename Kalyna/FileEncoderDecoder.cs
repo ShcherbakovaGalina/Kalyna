@@ -31,6 +31,15 @@ namespace Kalyna
 
         private Block GetKey()
         {
+            //var key = new Block
+            //{
+            //    Data = new List<byte>
+            //    {
+            //        15, 14, 13, 12, 11, 10, 9, 8,
+            //        7, 6, 5, 4, 3, 2, 1, 0
+            //    }
+            //};
+
             var keyFilePath = GetFullFilePath(KeyFileName);
 
             if (!File.Exists(keyFilePath)) return null;
@@ -38,7 +47,7 @@ namespace Kalyna
             using (var reader = new BinaryReader(File.Open(keyFilePath, FileMode.Open)))
             {
                 var key = reader.ReadBytes(16);
-                return key.Length != 16 ? null : new Block {Data = new List<byte>(key)};
+                return key.Length != 16 ? null : new Block { Data = new List<byte>(key) };
             }
         }
 
@@ -57,10 +66,13 @@ namespace Kalyna
             using (var reader = new BinaryReader(File.Open(plainFilePath, FileMode.Open)))
             using (var writer = new BinaryWriter(File.Open(encryptedFilePath, FileMode.Create)))
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                var fileSize = 0;
                 var block = reader.ReadBytes(16);
                 var previousBlock = block;
                 while (block.Length != 0)
                 {
+                    fileSize += block.Length;
                     BlocksNumber++;
                     if (block.Length < 16)
                     {
@@ -70,6 +82,7 @@ namespace Kalyna
                         for (var i = 0; i < 16 - len - 1; i++)
                             AddByteToBlock(ref block, (byte)Random.Next(255));
                         AddByteToBlock(ref block, numberOfAddedBytes);
+                        fileSize += numberOfAddedBytes;
                     }
 
                     var cipherText = algorithm.Encrypt(new Block
@@ -92,6 +105,10 @@ namespace Kalyna
                     }, key);
                     writer.Write(cipherText.Data.ToArray());
                 }
+
+                watch.Stop();
+                Console.WriteLine($"Encryption completed\nTime: {watch.Elapsed}\nFile size: {fileSize} Bytes" +
+                                  $"\nSpeed: {(int)(fileSize / watch.Elapsed.TotalSeconds)} Bytes per second");
             }
         }
 
@@ -108,10 +125,13 @@ namespace Kalyna
             using (var reader = new BinaryReader(File.Open(encryptedFilePath, FileMode.Open)))
             using (var writer = new BinaryWriter(File.Open(decryptedFilePath, FileMode.Create)))
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                var fileSize = 0;
                 var block = reader.ReadBytes(16);
                 var nextBlock = reader.ReadBytes(16);
                 while (block.Length != 0)
                 {
+                    fileSize += block.Length;
                     var plainText = algorithm.Decrypt(new Block
                     {
                         Data = new List<byte>(block)
@@ -127,6 +147,10 @@ namespace Kalyna
                     block = nextBlock;
                     nextBlock = reader.ReadBytes(16);
                 }
+
+                watch.Stop();
+                Console.WriteLine($"\nDecryption completed\nTime: {watch.Elapsed}\nFile size: {fileSize} Bytes" +
+                                  $"\nSpeed: {(int)(fileSize / watch.Elapsed.TotalSeconds)} Bytes per second");
             }
         }
     }

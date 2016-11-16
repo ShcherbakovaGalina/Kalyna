@@ -78,7 +78,8 @@ namespace Kalyna
 
         public List<Block> GenerateRoundsKeys(Block key)
         {
-            Log("Key", key);
+            if (UseLog)
+                Log("Key", key);
 
             for (var i = 0; i <= 10; i++)
                 RoundsKeys.Add(new Block());
@@ -94,7 +95,8 @@ namespace Kalyna
             //    }
             //};
             var kt = GenerateKt(key);
-            Log("KT", kt);
+            if (UseLog)
+                Log("KT", kt);
 
             for (var i = 0; i <= 10; i += 2)
             {
