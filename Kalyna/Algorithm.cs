@@ -158,14 +158,14 @@ namespace Kalyna
             }
 
             // Odd keys
-            for (var i = 1; i <= 9; i += 2)
+            for (var i = 1; i <= 10; i += 2)
             {
                 RoundsKeys[i].Data = RoundsKeys[i - 1].Data;
                 if (i == 7)
                 {
                     
                 }
-                RoundsKeys[i].RotateLeft(64);
+                RoundsKeys[i].RotateLeft(56);
             }
 
             return RoundsKeys;
