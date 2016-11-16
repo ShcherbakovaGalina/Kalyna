@@ -7,13 +7,14 @@ namespace Kalyna
 {
     public class FileEncoderDecoder
     {
-        public string FileName { get; set; }
+        public string PlainTextFileName { private get; set; }
+        public string EncryptedTextFileName { private get; set; }
+        public string DecryptedTextFileName { private get; set; }
 
-        public Block Key { get; set; }
+        public Block Key { private get; set; }
 
         private Random Random { get; } = new Random();
         private int BlocksNumber { get; set; }
-        private bool AreAddedRandomBytes { get; set; }
 
         private static string GetFullFilePath(string fileName)
         {
@@ -31,14 +32,16 @@ namespace Kalyna
 
         public void Encode()
         {
-            var filePath = GetFullFilePath(FileName);
+            var plainFilePath = GetFullFilePath(PlainTextFileName);
+            var encryptedFilePath = GetFullFilePath(EncryptedTextFileName);
 
-            if (!File.Exists(filePath)) return;
+            if (!File.Exists(plainFilePath)) return;
 
+            var areAddedRandomBytes = false;
             var algorithm = new Algorithm();
             algorithm.GenerateRoundsKeys(Key);
-            using (var reader = new BinaryReader(File.Open(filePath, FileMode.Open)))
-            using (var writer = new BinaryWriter(File.Open(filePath + "1", FileMode.Create)))
+            using (var reader = new BinaryReader(File.Open(plainFilePath, FileMode.Open)))
+            using (var writer = new BinaryWriter(File.Open(encryptedFilePath, FileMode.Create)))
             {
                 var block = reader.ReadBytes(16);
                 var previousBlock = block;
@@ -47,7 +50,7 @@ namespace Kalyna
                     BlocksNumber++;
                     if (block.Length < 16)
                     {
-                        AreAddedRandomBytes = true;
+                        areAddedRandomBytes = true;
                         var numberOfAddedBytes = (byte)(16 - block.Length);
                         var len = block.Length;
                         for (var i = 0; i < 16 - len - 1; i++)
@@ -64,7 +67,7 @@ namespace Kalyna
                     block = reader.ReadBytes(16);
                 }
 
-                if (!AreAddedRandomBytes && 1 <= previousBlock[0] && previousBlock[0] <= 16)
+                if (!areAddedRandomBytes && 1 <= previousBlock[0] && previousBlock[0] <= 16)
                 {
                     for (var i = 0; i < 15; i++)
                         AddByteToBlock(ref block, (byte)Random.Next(255));
@@ -80,13 +83,15 @@ namespace Kalyna
 
         public void Decode()
         {
-            var filePath = GetFullFilePath(FileName);
+            var encryptedFilePath = GetFullFilePath(EncryptedTextFileName);
+            var decryptedFilePath = GetFullFilePath(DecryptedTextFileName);
 
-            if (!File.Exists(filePath)) return;
+            if (!File.Exists(encryptedFilePath)) return;
 
             var algorithm = new Algorithm();
-            using (var reader = new BinaryReader(File.Open(filePath + "1", FileMode.Open)))
-            using (var writer = new BinaryWriter(File.Open(filePath + "2", FileMode.Create)))
+            algorithm.GenerateRoundsKeys(Key);
+            using (var reader = new BinaryReader(File.Open(encryptedFilePath, FileMode.Open)))
+            using (var writer = new BinaryWriter(File.Open(decryptedFilePath, FileMode.Create)))
             {
                 var block = reader.ReadBytes(16);
                 var nextBlock = reader.ReadBytes(16);
@@ -96,10 +101,10 @@ namespace Kalyna
                     {
                         Data = new List<byte>(block)
                     }, Key);
-                    if (nextBlock.Length == 0)
+                    if (nextBlock.Length == 0 && plainText.Data[0] <= 16)
                     {
                         var numberOfAddedBytes = plainText.Data[0];
-                        if (numberOfAddedBytes < 16)
+                        if (numberOfAddedBytes != 16)
                             writer.Write(plainText.Data.Where((d, idx) => numberOfAddedBytes <= idx).ToArray());
                     }
                     else
