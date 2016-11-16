@@ -7,10 +7,6 @@ namespace Kalyna
     {
         private static void Main()
         {
-            var algorithm = new Algorithm
-            {
-                UseLog = true
-            };
             var key = new Block
             {
                 Data = new List<byte>
@@ -20,28 +16,40 @@ namespace Kalyna
                 }
             };
 
-            var keys = algorithm.GenerateRoundsKeys(key);
-            Console.WriteLine();
-            for (var i = 0; i < keys.Count; i++)
-            {
-                algorithm.Log(i.ToString(), keys[i]);
-            }
+            //var algorithm = new Algorithm
+            //{
+            //    UseLog = true
+            //};
+            //var keys = algorithm.GenerateRoundsKeys(key);
+            //Console.WriteLine();
+            //for (var i = 0; i < keys.Count; i++)
+            //{
+            //    algorithm.Log(i.ToString(), keys[i]);
+            //}
 
-            var plainText = new Block
+            //var plainText = new Block
+            //{
+            //    Data = new List<byte>
+            //    {
+            //        31, 30, 29, 28, 27, 26, 25, 24,
+            //        23, 22, 21, 20, 19, 18, 17, 16
+            //    }
+            //};
+            //var cipherText = algorithm.Encrypt(plainText, key);
+            //var newPlain = algorithm.Decrypt(cipherText, key);
+
+            //Console.WriteLine();
+            //algorithm.Log("Plain", plainText);
+            //algorithm.Log("Cipher", cipherText);
+            //algorithm.Log("New plain", newPlain);
+
+            var f = new FileEncoderDecoder
             {
-                Data = new List<byte>
-                {
-                    31, 30, 29, 28, 27, 26, 25, 24,
-                    23, 22, 21, 20, 19, 18, 17, 16
-                }
+                FileName = "File.txt",
+                Key = key
             };
-            var cipherText = algorithm.Encrypt(plainText, key);
-            var newPlain = algorithm.Decrypt(cipherText, key);
-
-            Console.WriteLine();
-            algorithm.Log("Plain", plainText);
-            algorithm.Log("Cipher", cipherText);
-            algorithm.Log("New plain", newPlain);
+            f.Encode();
+            f.Decode();
         }
     }
 }

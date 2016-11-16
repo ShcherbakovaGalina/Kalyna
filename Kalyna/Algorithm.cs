@@ -163,7 +163,7 @@ namespace Kalyna
                 RoundsKeys[i].Data = RoundsKeys[i - 1].Data;
                 if (i == 7)
                 {
-                    
+
                 }
                 RoundsKeys[i].RotateLeft(56);
             }
@@ -173,6 +173,9 @@ namespace Kalyna
 
         public Block Encrypt(Block plainText, Block key)
         {
+            if (RoundsKeys.Count == 0)
+                GenerateRoundsKeys(key);
+
             var cipherText = new Block(plainText);
             cipherText.AddRoundKey(RoundsKeys[0]);
 
@@ -222,6 +225,9 @@ namespace Kalyna
 
         public Block Decrypt(Block cipherText, Block key)
         {
+            if (RoundsKeys.Count == 0)
+                GenerateRoundsKeys(key);
+
             var plainText = new Block(cipherText);
 
             plainText.SubRoundKey(RoundsKeys[10]);
