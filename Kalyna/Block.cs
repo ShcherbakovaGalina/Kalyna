@@ -15,6 +15,10 @@ namespace Kalyna
             Data = new List<byte>(block.Data);
         }
 
+        /// <summary>
+        /// Adds round key
+        /// </summary>
+        /// <param name="key"></param>
         public void AddRoundKey(Block key)
         {
             const int n = 8;
@@ -26,14 +30,12 @@ namespace Kalyna
                 for (var j = 0; j < n; j++)
                     Data[i + j] = j < newData.Length ? newData[j] : (byte)0;
             }
-            //var dataBi = new BigInteger(Data.ToArray());
-            ////var keyBi = new BigInteger(key.Data.ToArray());
-            //dataBi += new BigInteger(key.Data.ToArray());
-            //Data = new List<byte>(dataBi.ToByteArray().Where((t, idx) => idx < 16));
-            //for (var i = 0; i < Data.Count; i++)
-            //    Data[i] += key.Data[i];
         }
 
+        /// <summary>
+        /// Substracts round key
+        /// </summary>
+        /// <param name="key"></param>
         public void SubRoundKey(Block key)
         {
             const int n = 8;
@@ -45,14 +47,12 @@ namespace Kalyna
                 for (var j = 0; j < n; j++)
                     Data[i + j] = j < newData.Length ? newData[j] : (byte)0;
             }
-            //var dataBi = new BigInteger(Data.ToArray());
-            ////var keyBi = new BigInteger(key.Data.ToArray());
-            //dataBi += new BigInteger(key.Data.ToArray());
-            //Data = new List<byte>(dataBi.ToByteArray().Where((t, idx) => idx < 16));
-            //for (var i = 0; i < Data.Count; i++)
-            //    Data[i] += key.Data[i];
         }
 
+        /// <summary>
+        /// Cyclic shifts internal state matrix rightwards
+        /// </summary>
+        /// <param name="i">Positions number</param>
         public void RotateRight(int i)
         {
             var bi = new BigInteger(Data.ToArray());
@@ -60,6 +60,10 @@ namespace Kalyna
             Data = new List<byte>(bi.ToByteArray().Where((t, idx) => idx < 16));
         }
 
+        /// <summary>
+        /// Cyclic shifts internal state matrix leftwards
+        /// </summary>
+        /// <param name="i">Positions number</param>
         public void RotateLeft(int i)
         {
             var bi = new BigInteger(Data.ToArray());
@@ -67,6 +71,10 @@ namespace Kalyna
             Data = new List<byte>(bi.ToByteArray().Where((t, idx) => idx < 16));
         }
 
+        /// <summary>
+        /// Shifts internal state matrix leftwards
+        /// </summary>
+        /// <param name="i">Positions number</param>
         public void ShiftLeft(int i)
         {
             var bi = new BigInteger(Data.ToArray());
@@ -74,6 +82,10 @@ namespace Kalyna
             Data = new List<byte>(bi.ToByteArray());
         }
 
+        /// <summary>
+        /// Changes bytes from S-matrix
+        /// </summary>
+        /// <param name="table"></param>
         public void SubBytes(byte[][][] table)
         {
             var trump = 0;
@@ -87,33 +99,42 @@ namespace Kalyna
             }
         }
 
+        /// <summary>
+        /// Swap two items of internal state matrix
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
         private void ShiftBytesPair(int i1, int i2)
         {
             var buf = Data[i1];
             Data[i1] = Data[i2];
             Data[i2] = buf;
-
-            //var bi = new BigInteger(new[] { Data[i1], Data[i2] });
-            //var rightBit = bi & 1;
-            //bi >>= 1;
-            //bi |= rightBit << 15;
-            //var newBytes = bi.ToByteArray();
-            //Data[i1] = newBytes[0];
-            //Data[i2] = newBytes[1];
         }
 
+        /// <summary>
+        /// Performs internal state matrix rows cyclic right shift (>>> 8)
+        /// </summary>
         public void ShiftRows()
         {
             for (var i = 11; 8 <= i; --i)
                 ShiftBytesPair(i, i - 8);
         }
 
+        /// <summary>
+        /// Performs internal state matrix rows cyclic left shift (>>> 8)
+        /// </summary>
         public void ShiftRowsRev()
         {
             for (var i = 11; 8 <= i; --i)
                 ShiftBytesPair(i - 8, i);
         }
 
+        /// <summary>
+        /// Performs Galois multiplication. From Wikipedia
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private static byte Gmul(int a, int b)
         {
             byte p = 0; /* the product of the multiplication */
@@ -131,6 +152,10 @@ namespace Kalyna
             return p;
         }
 
+        /// <summary>
+        /// Mixes columns of internal state matrix
+        /// </summary>
+        /// <param name="table"></param>
         public void MixColumns(byte[][] table)
         {
             var dataCopy = new List<byte>(Data);
@@ -166,6 +191,10 @@ namespace Kalyna
             }
         }
 
+        /// <summary>
+        /// Performs exclusive or (XOR) with round key
+        /// </summary>
+        /// <param name="key"></param>
         public void Xor(Block key)
         {
             for (var i = 0; i < Data.Count; i++)

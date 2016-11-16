@@ -6,7 +6,7 @@
         {
             var f = new FileEncoderDecoder
             {
-                PlainTextFileName = "Files\\Plain.txt",
+                PlainTextFileName = "Files\\Plain small.txt",
                 EncryptedTextFileName = "Files\\Encrypted.txt",
                 DecryptedTextFileName = "Files\\Decrypted.txt",
                 KeyFileName = "Files\\Key.txt"
