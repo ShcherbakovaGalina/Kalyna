@@ -6,7 +6,7 @@ namespace Kalyna
 {
     public class Algorithm
     {
-        public bool UseLog { get; set; } = false;
+        public bool UseLog { get; set; } = true;
 
         private List<Block> RoundsKeys { get; } = new List<Block>();
 
@@ -17,6 +17,9 @@ namespace Kalyna
 
         private Block GenerateKt(Block key)
         {
+            if (UseLog)
+                Console.WriteLine("KT generation:");
+
             var kt = new Block
             {
                 Data = new List<byte>
@@ -78,6 +81,9 @@ namespace Kalyna
 
         public List<Block> GenerateRoundsKeys(Block key)
         {
+            if (UseLog)
+                Console.WriteLine("Round keys generation:");
+
             if (UseLog)
                 Log("Key", key);
 
@@ -160,14 +166,17 @@ namespace Kalyna
             }
 
             // Odd keys
-            for (var i = 1; i <= 10; i += 2)
+            for (var i = 1; i <= 9; i += 2)
             {
                 RoundsKeys[i].Data = RoundsKeys[i - 1].Data;
-                if (i == 7)
-                {
-
-                }
                 RoundsKeys[i].RotateLeft(56);
+            }
+
+            if (UseLog)
+            {
+                Console.WriteLine();
+                for (var i = 1; i <= 10; i++)
+                    Log($"round[{i}].r_rkey:", RoundsKeys[i]);
             }
 
             return RoundsKeys;
@@ -177,6 +186,9 @@ namespace Kalyna
         {
             if (RoundsKeys.Count == 0)
                 GenerateRoundsKeys(key);
+
+            if (UseLog)
+                Console.WriteLine("\nEncryption:");
 
             var cipherText = new Block(plainText);
             cipherText.AddRoundKey(RoundsKeys[0]);
@@ -221,6 +233,8 @@ namespace Kalyna
             cipherText.AddRoundKey(RoundsKeys[10]);
             if (UseLog)
                 Log("round[10].add_rkey:", cipherText);
+            if (UseLog)
+                Console.WriteLine();
 
             return cipherText;
         }
@@ -229,6 +243,9 @@ namespace Kalyna
         {
             if (RoundsKeys.Count == 0)
                 GenerateRoundsKeys(key);
+
+            if (UseLog)
+                Console.WriteLine("\nDecryption:");
 
             var plainText = new Block(cipherText);
 
@@ -273,6 +290,8 @@ namespace Kalyna
             plainText.SubRoundKey(RoundsKeys[0]);
             if (UseLog)
                 Log("round[0].sub_rkey:", plainText);
+            if (UseLog)
+                Console.WriteLine();
 
             return plainText;
         }

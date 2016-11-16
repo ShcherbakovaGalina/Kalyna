@@ -108,7 +108,7 @@ namespace Kalyna
 
                 watch.Stop();
                 Console.WriteLine($"Encryption completed\nTime: {watch.Elapsed}\nFile size: {fileSize} Bytes" +
-                                  $"\nSpeed: {(int)(fileSize / watch.Elapsed.TotalSeconds)} Bytes per second");
+                                  $"\nSpeed: {(int)(fileSize / watch.Elapsed.TotalSeconds)} Bytes per second\n");
             }
         }
 
@@ -150,7 +150,7 @@ namespace Kalyna
 
                 watch.Stop();
                 Console.WriteLine($"\nDecryption completed\nTime: {watch.Elapsed}\nFile size: {fileSize} Bytes" +
-                                  $"\nSpeed: {(int)(fileSize / watch.Elapsed.TotalSeconds)} Bytes per second");
+                                  $"\nSpeed: {(int)(fileSize / watch.Elapsed.TotalSeconds)} Bytes per second\n");
             }
         }
     }

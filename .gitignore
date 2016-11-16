@@ -240,3 +240,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/T8 Cryptography Lab2 Report.docx
+/Abstract.docx
